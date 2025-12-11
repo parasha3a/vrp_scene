@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VRP Solution - Web-VR Stand</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #020617;
+      color: #f8fafc;
+      overflow: hidden;
+    }
+
+    #canvas-container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+
+    #controls-hint {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(2, 6, 23, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 12px 24px;
+      border-radius: 8px;
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      color: #e0e7ff;
+      font-size: 14px;
+      z-index: 10;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    #loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 20;
+    }
+
+    #loading h1 {
+      font-size: 32px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+    }
+
+    #loading p {
+      color: #94a3b8;
+      font-size: 16px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+
+  <div id="loading">
+    <h1>VRP Solution</h1>
+    <p>Загрузка Web-VR стенда...</p>
+  </div>
+
+  <div id="controls-hint" class="hidden">
+    🖱️ Мышь для осмотра | WASD для перемещения | ESC для выхода
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
