@@ -2,8 +2,7 @@ import { defineConfig } from 'vite';
 
 // Для GitHub Pages: если репозиторий не username.github.io, используйте '/repo-name/'
 // Для корневого домена оставьте '/'
-// Измените 'vrp_scene-main' на имя вашего репозитория, если отличается
-const repoName = 'vrp_scene-main';
+const repoName = 'vrp_scene';
 const base = process.env.GITHUB_PAGES ? `/${repoName}/` : '/';
 
 export default defineConfig({
