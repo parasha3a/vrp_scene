@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import QRCode from 'qrcode';
 
 export function createContactsZone() {
   const zoneGroup = new THREE.Group();
@@ -40,6 +41,9 @@ export function createContactsZone() {
   const qrPanel = createQRPanel();
   qrPanel.position.set(0, 2.6, 0);
   zoneGroup.add(qrPanel);
+  
+  // Асинхронно генерируем QR-код и обновляем текстуру
+  generateQRTexture(qrPanel);
 
   // Рамка с неоновым свечением
   const frameGeometry = new THREE.BoxGeometry(1.3, 1.3, 0.05);
@@ -76,77 +80,22 @@ export function createContactsZone() {
 }
 
 function createQRPanel() {
+  // Создаем временный canvas с заглушкой
   const canvas = document.createElement('canvas');
   canvas.width = 512;
   canvas.height = 512;
   const ctx = canvas.getContext('2d');
 
-  // Фон
+  // Белый фон
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Простой QR-код (схематичный)
-  const qrSize = 400;
-  const qrOffset = (canvas.width - qrSize) / 2;
-  const moduleSize = qrSize / 21; // 21x21 модулей для простого QR
-
-  // Паттерн QR-кода (упрощенный)
-  const pattern = [
-    [1,1,1,1,1,1,1,0,1,0,1,0,1,0,1,1,1,1,1,1,1],
-    [1,0,0,0,0,0,1,0,0,1,0,1,0,0,1,0,0,0,0,0,1],
-    [1,0,1,1,1,0,1,0,1,0,1,0,1,0,1,0,1,1,1,0,1],
-    [1,0,1,1,1,0,1,0,0,1,0,1,0,0,1,0,1,1,1,0,1],
-    [1,0,1,1,1,0,1,0,1,0,1,0,1,0,1,0,1,1,1,0,1],
-    [1,0,0,0,0,0,1,0,0,1,0,1,0,0,1,0,0,0,0,0,1],
-    [1,1,1,1,1,1,1,0,1,0,1,0,1,0,1,1,1,1,1,1,1],
-    [0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0],
-    [1,0,1,0,1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,0,1],
-    [0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
-    [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
-    [0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
-    [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
-    [0,0,0,0,0,0,0,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
-    [1,1,1,1,1,1,1,0,0,1,0,1,0,1,0,1,0,1,0,1,0],
-    [1,0,0,0,0,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
-    [1,0,1,1,1,0,1,0,0,1,0,1,0,1,0,1,0,1,0,1,0],
-    [1,0,1,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
-    [1,0,1,1,1,0,1,0,0,1,0,1,0,1,0,1,0,1,0,1,0],
-    [1,0,0,0,0,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
-    [1,1,1,1,1,1,1,0,0,1,0,1,0,1,0,1,0,1,0,1,0]
-  ];
-
-  ctx.fillStyle = '#000000';
-  for (let row = 0; row < pattern.length; row++) {
-    for (let col = 0; col < pattern[row].length; col++) {
-      if (pattern[row][col] === 1) {
-        ctx.fillRect(
-          qrOffset + col * moduleSize,
-          qrOffset + row * moduleSize,
-          moduleSize,
-          moduleSize
-        );
-      }
-    }
-  }
-
-  // Логотип в центре QR
-  const logoSize = 80;
-  const logoOffset = (canvas.width - logoSize) / 2;
-
-  // Белый фон для логотипа
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(logoOffset - 5, logoOffset - 5, logoSize + 10, logoSize + 10);
-
-  // Градиент для "VRP"
-  const gradient = ctx.createLinearGradient(logoOffset, logoOffset, logoOffset + logoSize, logoOffset + logoSize);
-  gradient.addColorStop(0, '#8b5cf6');
-  gradient.addColorStop(1, '#06b6d4');
-
-  ctx.fillStyle = gradient;
-  ctx.font = 'bold 32px Inter, sans-serif';
+  // Временный текст "Загрузка..."
+  ctx.fillStyle = '#8b5cf6';
+  ctx.font = 'bold 24px Inter, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('VRP', canvas.width / 2, canvas.height / 2);
+  ctx.fillText('Загрузка QR...', canvas.width / 2, canvas.height / 2);
 
   const texture = new THREE.CanvasTexture(canvas);
   const material = new THREE.MeshBasicMaterial({
@@ -155,7 +104,73 @@ function createQRPanel() {
   });
 
   const geometry = new THREE.PlaneGeometry(1.2, 1.2);
-  return new THREE.Mesh(geometry, material);
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.userData.canvas = canvas;
+  mesh.userData.texture = texture;
+  return mesh;
+}
+
+async function generateQRTexture(qrPanel) {
+  const canvas = qrPanel.userData.canvas;
+  const texture = qrPanel.userData.texture;
+  const ctx = canvas.getContext('2d');
+
+  // Очищаем canvas
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Создаем временный canvas для QR-кода
+  const qrCanvas = document.createElement('canvas');
+  const qrSize = 400;
+  qrCanvas.width = qrSize;
+  qrCanvas.height = qrSize;
+
+  // Генерируем QR-код с фиолетовым цветом
+  try {
+    await QRCode.toCanvas(qrCanvas, 'https://parasha3a.github.io/vrp-solution/', {
+      width: qrSize,
+      margin: 2,
+      color: {
+        dark: '#8b5cf6', // Фиолетовый цвет для модулей
+        light: '#ffffff' // Белый фон
+      }
+    });
+
+    // Копируем QR-код на основной canvas по центру
+    const qrOffset = (canvas.width - qrSize) / 2;
+    ctx.drawImage(qrCanvas, qrOffset, qrOffset);
+
+    // Логотип в центре QR
+    const logoSize = 80;
+    const logoOffset = (canvas.width - logoSize) / 2;
+
+    // Белый фон для логотипа
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(logoOffset - 5, logoOffset - 5, logoSize + 10, logoSize + 10);
+
+    // Градиент для "VRP"
+    const gradient = ctx.createLinearGradient(logoOffset, logoOffset, logoOffset + logoSize, logoOffset + logoSize);
+    gradient.addColorStop(0, '#8b5cf6');
+    gradient.addColorStop(1, '#06b6d4');
+
+    ctx.fillStyle = gradient;
+    ctx.font = 'bold 32px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('VRP', canvas.width / 2, canvas.height / 2);
+
+    // Обновляем текстуру
+    texture.needsUpdate = true;
+  } catch (error) {
+    console.error('Ошибка генерации QR-кода:', error);
+    // Fallback: рисуем простой текст
+    ctx.fillStyle = '#8b5cf6';
+    ctx.font = 'bold 24px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Ошибка QR', canvas.width / 2, canvas.height / 2);
+    texture.needsUpdate = true;
+  }
 }
 
 function createZoneLabel(text, color) {
@@ -232,7 +247,7 @@ export function enlargeQR(qrPanel, parentGroup) {
 
   // Показываем сообщение
   if (!parentGroup.userData.isEnlarged) {
-    showMessage('Ссылка: vrp-solution.com/demo');
+    showMessage('Ссылка: parasha3a.github.io/vrp-solution/');
   }
 }
 
