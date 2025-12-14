@@ -187,16 +187,12 @@ export class InteractionManager {
 
       case 'ContactsZone':
         const qrPanel = zone.userData.qrPanel;
-<<<<<<< HEAD
         // Если QR уже увеличен, переходим на сайт
         if (zone.userData.isEnlarged) {
           window.location.href = 'https://parasha3a.github.io/vrp-solution/';
         } else {
           enlargeQR(qrPanel, zone);
         }
-=======
-        enlargeQR(qrPanel, zone);
->>>>>>> 3775f6b18885c51af52caea3728bd8e0534c3245
         break;
 
       case 'AppUIZone':
