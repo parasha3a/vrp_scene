@@ -1,0 +1,18 @@
+{
+  "name": "vrp-solution-webvr",
+  "version": "1.0.0",
+  "description": "VRP Solution - Interactive Web-VR Exhibition Stand",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4",
+    "three": "^0.160.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
