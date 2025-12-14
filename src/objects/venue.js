@@ -5,7 +5,7 @@ export function createExhibitionHall() {
   hall.name = 'ExhibitionHall';
 
   const shell = new THREE.Mesh(
-    new THREE.BoxGeometry(24, 10, 18),
+    new THREE.BoxGeometry(30, 10, 24),
     new THREE.MeshStandardMaterial({
       color: 0x0b1220,
       roughness: 0.85,
@@ -15,12 +15,12 @@ export function createExhibitionHall() {
       emissiveIntensity: 0.25
     })
   );
-  shell.position.set(0, 5, 3);
+  shell.position.set(0, 5, 3.5);
   shell.receiveShadow = true;
   hall.add(shell);
 
   const floorInset = new THREE.Mesh(
-    new THREE.PlaneGeometry(18, 12),
+    new THREE.PlaneGeometry(24, 18),
     new THREE.MeshStandardMaterial({
       color: 0x0f172a,
       metalness: 0.45,
@@ -30,7 +30,7 @@ export function createExhibitionHall() {
     })
   );
   floorInset.rotation.x = -Math.PI / 2;
-  floorInset.position.set(0, 0.02, 3);
+  floorInset.position.set(0, 0.02, 3.5);
   floorInset.receiveShadow = true;
   hall.add(floorInset);
 
@@ -41,10 +41,10 @@ export function createExhibitionHall() {
     metalness: 0.35
   });
   const columnPositions = [
-    [-9.5, 2.5, -1],
-    [9.5, 2.5, -1],
-    [-9.5, 2.5, 7.5],
-    [9.5, 2.5, 7.5]
+    [-12, 2.5, -2],
+    [12, 2.5, -2],
+    [-12, 2.5, 9],
+    [12, 2.5, 9]
   ];
   columnPositions.forEach((pos) => {
     const column = new THREE.Mesh(columnGeometry, columnMaterial);
@@ -67,7 +67,7 @@ export function createExhibitionHall() {
     hall.add(band);
   });
 
-  const stripGeometry = new THREE.BoxGeometry(12, 0.08, 0.12);
+  const stripGeometry = new THREE.BoxGeometry(16, 0.08, 0.12);
   const stripMaterial = new THREE.MeshStandardMaterial({
     color: 0x0ea5e9,
     emissive: 0x0ea5e9,
@@ -75,7 +75,7 @@ export function createExhibitionHall() {
     metalness: 0.8,
     roughness: 0.2
   });
-  const stripZ = [-1.5, 3, 7.5];
+  const stripZ = [-2, 3.5, 9];
   stripZ.forEach((z) => {
     const strip = new THREE.Mesh(stripGeometry, stripMaterial);
     strip.position.set(0, 9.4, z);
@@ -85,9 +85,9 @@ export function createExhibitionHall() {
   });
 
   const lightPositions = [
-    { x: -6, y: 8.8, z: -1 },
-    { x: 0, y: 8.8, z: 3 },
-    { x: 6, y: 8.8, z: 7 }
+    { x: -8, y: 8.8, z: -1 },
+    { x: 0, y: 8.8, z: 3.5 },
+    { x: 8, y: 8.8, z: 8 }
   ];
   lightPositions.forEach((pos) => {
     const ceilingLight = new THREE.PointLight(0x7dd3fc, 0.6, 18, 2);
@@ -105,9 +105,9 @@ export function createExhibitionHall() {
   });
   const windowGeometry = new THREE.PlaneGeometry(6, 3);
   const windowOffsets = [
-    { x: 0, y: 3, z: -5.9 },
-    { x: -11.9, y: 3, z: 3, ry: Math.PI / 2 },
-    { x: 11.9, y: 3, z: 3, ry: -Math.PI / 2 }
+    { x: 0, y: 3, z: -7.9 },
+    { x: -14.9, y: 3, z: 3.5, ry: Math.PI / 2 },
+    { x: 14.9, y: 3, z: 3.5, ry: -Math.PI / 2 }
   ];
   windowOffsets.forEach((offset) => {
     const glass = new THREE.Mesh(windowGeometry, windowMaterial);
@@ -124,10 +124,10 @@ export function createExhibitionHall() {
     roughness: 0.15
   });
   const trimSegments = [
-    { size: [24, 0.05, 0.05], position: [0, 0.3, -5.95] },
-    { size: [24, 0.05, 0.05], position: [0, 0.3, 11.95] },
-    { size: [0.05, 0.05, 18], position: [-11.95, 0.3, 3] },
-    { size: [0.05, 0.05, 18], position: [11.95, 0.3, 3] }
+    { size: [30, 0.05, 0.05], position: [0, 0.3, -7.95] },
+    { size: [30, 0.05, 0.05], position: [0, 0.3, 14.95] },
+    { size: [0.05, 0.05, 24], position: [-14.95, 0.3, 3.5] },
+    { size: [0.05, 0.05, 24], position: [14.95, 0.3, 3.5] }
   ];
   trimSegments.forEach((segment) => {
     const trim = new THREE.Mesh(

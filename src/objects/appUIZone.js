@@ -4,29 +4,45 @@ export function createAppUIZone() {
   const zoneGroup = new THREE.Group();
   zoneGroup.name = 'AppUIZone';
   // Правый полукруг, нижняя позиция (сдвинут еще правее)
-  zoneGroup.position.set(6.5, 0, 5.5);
-  zoneGroup.rotation.y = -Math.PI * 0.28;
+  zoneGroup.position.set(8, 0, 7);
+  zoneGroup.rotation.y = -Math.PI * 0.35;
 
-  // Подставка (узкая для вертикального экрана)
-  const pedestalGeometry = new THREE.BoxGeometry(1.5, 1.5, 1.2);
+  // Подставка (усеченный конус)
+  const pedestalGeometry = new THREE.CylinderGeometry(0.65, 0.75, 1.4, 8);
   const pedestalMaterial = new THREE.MeshStandardMaterial({
     color: 0x1e293b,
-    roughness: 0.5,
-    metalness: 0.6
+    roughness: 0.4,
+    metalness: 0.7,
+    emissive: 0x06b6d4,
+    emissiveIntensity: 0.1
   });
   const pedestal = new THREE.Mesh(pedestalGeometry, pedestalMaterial);
-  pedestal.position.y = 0.75;
+  pedestal.position.y = 0.7;
   pedestal.castShadow = true;
   pedestal.receiveShadow = true;
   zoneGroup.add(pedestal);
 
+  // Верхняя платформа
+  const platformGeometry = new THREE.CylinderGeometry(0.7, 0.7, 0.1, 8);
+  const platformMaterial = new THREE.MeshStandardMaterial({
+    color: 0x06b6d4,
+    roughness: 0.3,
+    metalness: 0.8,
+    emissive: 0x06b6d4,
+    emissiveIntensity: 0.3
+  });
+  const platform = new THREE.Mesh(platformGeometry, platformMaterial);
+  platform.position.y = 1.45;
+  platform.castShadow = true;
+  zoneGroup.add(platform);
+
   // UI экран приложения (НА подставке) - вертикальный
   const appUI = createAppUIScreen();
-  appUI.position.set(0, 3.2, 0);
+  appUI.position.set(0, 2.9, 0);
   zoneGroup.add(appUI);
 
   // Рамка для UI экрана (вертикальная)
-  const frameGeometry = new THREE.BoxGeometry(1.56, 3.36, 0.05);
+  const frameGeometry = new THREE.BoxGeometry(1.3, 2.8, 0.05);
   const frameMaterial = new THREE.MeshStandardMaterial({
     color: 0x06b6d4,
     emissive: 0x06b6d4,
@@ -35,12 +51,12 @@ export function createAppUIZone() {
     metalness: 0.9
   });
   const frame = new THREE.Mesh(frameGeometry, frameMaterial);
-  frame.position.set(0, 3.2, -0.03);
+  frame.position.set(0, 2.9, -0.03);
   zoneGroup.add(frame);
 
   // Заголовок
   const label = createZoneLabel('UI ПРИЛОЖЕНИЯ', 0x06b6d4);
-  label.position.set(0, 5.2, 0);
+  label.position.set(0, 4.5, 0);
   zoneGroup.add(label);
 
   // Подсветка
@@ -78,7 +94,7 @@ function createAppUIScreen() {
     transparent: true
   });
 
-  const geometry = new THREE.PlaneGeometry(1.44, 3.12);
+  const geometry = new THREE.PlaneGeometry(1.2, 2.6);
   const screen = new THREE.Mesh(geometry, material);
 
   screen.userData.canvas = canvas;

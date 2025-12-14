@@ -82,10 +82,10 @@ class VRPExhibition {
 
     // Границы для камеры (в пределах выставочного зала)
     this.cameraBounds = {
-      minX: -11,
-      maxX: 11,
+      minX: -13,
+      maxX: 13,
       minZ: -8,
-      maxZ: 9
+      maxZ: 11
     };
 
     // Система управления движением с клавиатуры
@@ -175,8 +175,12 @@ class VRPExhibition {
     this.interactionManager = new InteractionManager(
       this.camera,
       this.scene,
-      this.renderer.domElement
+      this.renderer.domElement,
+      this.controls
     );
+
+    // Регистрируем главный стенд как интерактивный объект
+    this.interactionManager.registerZone(mainStand);
 
     // Создаём продуктовые зоны
     const routesZone = createRoutesZone();
@@ -205,7 +209,7 @@ class VRPExhibition {
     this.interactionManager.registerZone(appUIZone);
 
     // Временная сетка для ориентации
-    const gridHelper = new THREE.GridHelper(20, 20, 0x8b5cf6, 0x1e293b);
+    const gridHelper = new THREE.GridHelper(30, 30, 0x8b5cf6, 0x1e293b);
     gridHelper.material.opacity = 0.2;
     gridHelper.material.transparent = true;
     this.scene.add(gridHelper);
@@ -236,7 +240,7 @@ class VRPExhibition {
 
     // Северная стена (сзади)
     const northWall = new THREE.Mesh(
-      new THREE.BoxGeometry(25, wallHeight, wallThickness),
+      new THREE.BoxGeometry(30, wallHeight, wallThickness),
       wallMaterial
     );
     northWall.position.set(0, wallHeight / 2, -10);
@@ -244,26 +248,26 @@ class VRPExhibition {
 
     // Южная стена (спереди)
     const southWall = new THREE.Mesh(
-      new THREE.BoxGeometry(25, wallHeight, wallThickness),
+      new THREE.BoxGeometry(30, wallHeight, wallThickness),
       wallMaterial
     );
-    southWall.position.set(0, wallHeight / 2, 10);
+    southWall.position.set(0, wallHeight / 2, 12);
     this.scene.add(southWall);
 
     // Западная стена (слева)
     const westWall = new THREE.Mesh(
-      new THREE.BoxGeometry(wallThickness, wallHeight, 20),
+      new THREE.BoxGeometry(wallThickness, wallHeight, 24),
       wallMaterial
     );
-    westWall.position.set(-12, wallHeight / 2, 0);
+    westWall.position.set(-14, wallHeight / 2, 1);
     this.scene.add(westWall);
 
     // Восточная стена (справа)
     const eastWall = new THREE.Mesh(
-      new THREE.BoxGeometry(wallThickness, wallHeight, 20),
+      new THREE.BoxGeometry(wallThickness, wallHeight, 24),
       wallMaterial
     );
-    eastWall.position.set(12, wallHeight / 2, 0);
+    eastWall.position.set(14, wallHeight / 2, 1);
     this.scene.add(eastWall);
   }
 

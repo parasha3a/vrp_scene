@@ -4,21 +4,37 @@ export function createDashboardZone() {
   const zoneGroup = new THREE.Group();
   zoneGroup.name = 'DashboardZone';
   // Левый полукруг, средняя позиция (раздвинут шире)
-  zoneGroup.position.set(-6.5, 0, 3.5);
-  zoneGroup.rotation.y = Math.PI * 0.25;
+  zoneGroup.position.set(-8.5, 0, 4);
+  zoneGroup.rotation.y = Math.PI * 0.3;
 
-  // Подставка
-  const pedestalGeometry = new THREE.BoxGeometry(1.2, 1.5, 1.2);
+  // Подставка (усеченный конус)
+  const pedestalGeometry = new THREE.CylinderGeometry(0.65, 0.75, 1.4, 8);
   const pedestalMaterial = new THREE.MeshStandardMaterial({
     color: 0x1e293b,
-    roughness: 0.5,
-    metalness: 0.6
+    roughness: 0.4,
+    metalness: 0.7,
+    emissive: 0x06b6d4,
+    emissiveIntensity: 0.1
   });
   const pedestal = new THREE.Mesh(pedestalGeometry, pedestalMaterial);
-  pedestal.position.y = 0.75;
+  pedestal.position.y = 0.7;
   pedestal.castShadow = true;
   pedestal.receiveShadow = true;
   zoneGroup.add(pedestal);
+
+  // Верхняя платформа
+  const platformGeometry = new THREE.CylinderGeometry(0.7, 0.7, 0.1, 8);
+  const platformMaterial = new THREE.MeshStandardMaterial({
+    color: 0x06b6d4,
+    roughness: 0.3,
+    metalness: 0.8,
+    emissive: 0x06b6d4,
+    emissiveIntensity: 0.3
+  });
+  const platform = new THREE.Mesh(platformGeometry, platformMaterial);
+  platform.position.y = 1.45;
+  platform.castShadow = true;
+  zoneGroup.add(platform);
 
   // Экран дашборда (НА подставке - поднят выше)
   const dashboard = createDashboardScreen();

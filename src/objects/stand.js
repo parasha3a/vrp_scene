@@ -12,7 +12,7 @@ export function createStand() {
     color: 0x020617,
     roughness: 0.3,
     metalness: 0.7,
-    emissive: 0x0a0f1e,
+    emissive: 0x8b5cf6, // Фиолетовое свечение для hover
     emissiveIntensity: 0.1
   });
   const backPanel = new THREE.Mesh(backPanelGeometry, backPanelMaterial);
@@ -65,7 +65,9 @@ export function createStand() {
   const baseMaterial = new THREE.MeshStandardMaterial({
     color: 0x1e293b,
     roughness: 0.6,
-    metalness: 0.4
+    metalness: 0.4,
+    emissive: 0x8b5cf6,
+    emissiveIntensity: 0.05
   });
   const base = new THREE.Mesh(baseGeometry, baseMaterial);
   base.position.set(0, 0.15, 0);
@@ -118,119 +120,142 @@ function drawRouteLines(ctx, width, height) {
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
 
-  // Массив путей для создания густой сети маршрутов (яркие цвета как на скрине)
-  const paths = [
-    // Левая верхняя фиолетовая линия с выходом за край
+  // Линии по периметру стенда (как на скриншоте)
+  const routes = [
+    // Левая верхняя линия (вертикаль + горизонталь с изгибом)
     {
       points: [
-        [-100, 150], [120, 150], [120, 50], [260, 50], [300, 90], [450, 90]
+        [-50, -50],
+        [-50, 180],
+        [100, 180],
+        [100, 240],
+        [380, 240]
       ],
-      gradient: ['#e879f9', '#c026d3']
+      gradient: ['#e879f9', '#a855f7']
     },
-    // Левая средняя линия
+    // Верхняя центральная линия (горизонталь с изгибом вниз)
     {
       points: [
-        [-100, 330], [100, 330], [150, 380], [150, 520], [250, 620], [450, 620]
+        [280, -50],
+        [280, 100],
+        [450, 100],
+        [450, 240],
+        [700, 240]
       ],
-      gradient: ['#d946ef', '#a855f7']
+      gradient: ['#a855f7', '#8b5cf6']
     },
-    // Левая нижняя фиолетовая
+    // Правая верхняя диагональная
     {
       points: [
-        [100, height + 100], [100, height - 100], [180, height - 180], [350, height - 180], [450, height - 80]
+        [620, -50],
+        [620, 80],
+        [920, 240]
       ],
-      gradient: ['#c026d3', '#e879f9']
+      gradient: ['#8b5cf6', '#06b6d4']
     },
-    // Верхняя центральная линия (фиолет → бирюза)
+    // Правая верхняя горизонталь с изгибом
     {
       points: [
-        [200, -100], [200, 80], [350, 230], [600, 230], [700, 130]
-      ],
-      gradient: ['#a855f7', '#22d3ee']
-    },
-    // Диагональная центральная линия
-    {
-      points: [
-        [350, 100], [450, 200], [600, 200], [700, 300], [850, 450]
-      ],
-      gradient: ['#c026d3', '#06b6d4']
-    },
-    // Нижняя центральная линия
-    {
-      points: [
-        [300, height + 100], [300, height - 50], [450, height - 200], [650, height - 200], [800, height - 50]
-      ],
-      gradient: ['#d946ef', '#22d3ee']
-    },
-    // Правая верхняя бирюзовая линия
-    {
-      points: [
-        [width + 100, -50], [width + 100, 120], [width - 100, 120], [width - 150, 170], [width - 150, 320], [width - 300, 470]
-      ],
-      gradient: ['#22d3ee', '#06b6d4']
-    },
-    // Правая средняя линия
-    {
-      points: [
-        [width - 50, 250], [width + 100, 250], [width + 100, 450]
-      ],
-      gradient: ['#06b6d4', '#0891b2']
-    },
-    // Правая нижняя бирюзовая
-    {
-      points: [
-        [width + 100, height + 100], [width + 100, height - 150], [width - 80, height - 150], [width - 130, height - 200], [width - 280, height - 350]
-      ],
-      gradient: ['#0891b2', '#22d3ee']
-    },
-    // Дополнительная правая нижняя
-    {
-      points: [
-        [width - 100, height - 50], [width + 50, height - 50], [width + 50, height + 100]
+        [800, -50],
+        [800, 60],
+        [960, 60],
+        [960, 180],
+        [1200, 180]
       ],
       gradient: ['#06b6d4', '#22d3ee']
     },
-    // Верхняя горизонтальная длинная линия
+    // Правая линия (вертикаль вниз с изгибами)
     {
       points: [
-        [-50, 50], [350, 50], [450, 150], [800, 150], [width + 50, 150]
+        [width + 50, -50],
+        [width + 50, 220],
+        [1200, 220],
+        [1200, 380],
+        [width + 50, 380]
       ],
-      gradient: ['#e879f9', '#22d3ee']
+      gradient: ['#22d3ee', '#0891b2']
     },
-    // Центральная соединительная линия
+    // Правая нижняя (горизонталь + изгиб)
     {
       points: [
-        [500, 150], [550, 200], [550, 400], [650, 500]
+        [width + 50, 500],
+        [1100, 500],
+        [1100, 620],
+        [920, 620],
+        [920, height + 50]
       ],
-      gradient: ['#a855f7', '#06b6d4']
+      gradient: ['#0891b2', '#06b6d4']
+    },
+    // Нижняя центральная
+    {
+      points: [
+        [800, height + 50],
+        [800, 680],
+        [580, 680],
+        [580, 600],
+        [380, 600]
+      ],
+      gradient: ['#06b6d4', '#8b5cf6']
+    },
+    // Левая нижняя диагональ
+    {
+      points: [
+        [520, height + 50],
+        [420, 720],
+        [280, 640],
+        [180, 640]
+      ],
+      gradient: ['#a855f7', '#c026d3']
+    },
+    // Левая нижняя вертикаль
+    {
+      points: [
+        [-50, height + 50],
+        [-50, 600],
+        [200, 600],
+        [200, 480],
+        [420, 480]
+      ],
+      gradient: ['#d946ef', '#a855f7']
+    },
+    // Левая средняя
+    {
+      points: [
+        [-50, 360],
+        [180, 360],
+        [180, 300],
+        [350, 300]
+      ],
+      gradient: ['#e879f9', '#c026d3']
     }
   ];
 
-  // Рисуем каждый путь со свечением
-  paths.forEach(path => {
-    const startPoint = path.points[0];
-    const endPoint = path.points[path.points.length - 1];
+  // Рисуем каждую линию со свечением и скругленными углами
+  routes.forEach(route => {
+    const startPoint = route.points[0];
+    const endPoint = route.points[route.points.length - 1];
     const gradient = ctx.createLinearGradient(startPoint[0], startPoint[1], endPoint[0], endPoint[1]);
-    gradient.addColorStop(0, path.gradient[0]);
-    gradient.addColorStop(1, path.gradient[1]);
+    gradient.addColorStop(0, route.gradient[0]);
+    gradient.addColorStop(1, route.gradient[1]);
 
     ctx.strokeStyle = gradient;
-    ctx.shadowColor = path.gradient[0];
+    ctx.shadowColor = route.gradient[0];
     ctx.shadowBlur = 25;
 
-    // Рисуем путь с плавными изгибами
+    // Рисуем путь со скругленными углами
     ctx.beginPath();
-    ctx.moveTo(path.points[0][0], path.points[0][1]);
+    ctx.moveTo(route.points[0][0], route.points[0][1]);
     
-    for (let i = 1; i < path.points.length - 1; i++) {
-      const xc = (path.points[i][0] + path.points[i + 1][0]) / 2;
-      const yc = (path.points[i][1] + path.points[i + 1][1]) / 2;
-      ctx.quadraticCurveTo(path.points[i][0], path.points[i][1], xc, yc);
+    // Используем quadraticCurveTo для плавных переходов
+    for (let i = 1; i < route.points.length - 1; i++) {
+      const xc = (route.points[i][0] + route.points[i + 1][0]) / 2;
+      const yc = (route.points[i][1] + route.points[i + 1][1]) / 2;
+      ctx.quadraticCurveTo(route.points[i][0], route.points[i][1], xc, yc);
     }
     
     // Последний сегмент
-    const lastIdx = path.points.length - 1;
-    ctx.lineTo(path.points[lastIdx][0], path.points[lastIdx][1]);
+    const lastIdx = route.points.length - 1;
+    ctx.lineTo(route.points[lastIdx][0], route.points[lastIdx][1]);
     
     ctx.stroke();
   });

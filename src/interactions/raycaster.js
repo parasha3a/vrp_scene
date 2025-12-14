@@ -4,10 +4,11 @@ import { expandDashboard } from '../objects/dashboardZone.js';
 import { enlargeQR } from '../objects/contactsZone.js';
 
 export class InteractionManager {
-  constructor(camera, scene, domElement) {
+  constructor(camera, scene, domElement, controls) {
     this.camera = camera;
     this.scene = scene;
     this.domElement = domElement;
+    this.controls = controls;
 
     this.raycaster = new THREE.Raycaster();
     this.mouse = new THREE.Vector2();
@@ -15,6 +16,11 @@ export class InteractionManager {
 
     this.interactiveZones = [];
     this.originalEmissiveIntensities = new Map();
+
+    // Данные для анимации телепортации
+    this.isTeleporting = false;
+    this.teleportStart = null;
+    this.teleportDuration = 1500; // 1.5 секунды
 
     this.setupEventListeners();
   }
@@ -141,7 +147,14 @@ export class InteractionManager {
   handleZoneClick(zone) {
     const zoneName = zone.name;
 
+    // Телепортация применяется ко всем зонам перед выполнением их специфических действий
+    this.teleportToZone(zone);
+
     switch (zoneName) {
+      case 'MainStand':
+        // Телепортация уже выполнена выше
+        break;
+
       case 'RoutesZone':
         if (!zone.userData.isAnimating) {
           zone.userData.isAnimating = true;
@@ -240,6 +253,84 @@ export class InteractionManager {
       tooltip.style.transition = 'opacity 0.5s';
       setTimeout(() => tooltip.remove(), 500);
     }, 3500);
+  }
+
+  teleportToZone(zone) {
+    if (this.isTeleporting) return;
+
+    // Получаем мировую позицию зоны
+    const zoneWorldPosition = new THREE.Vector3();
+    zone.getWorldPosition(zoneWorldPosition);
+
+    // Получаем rotation зоны относительно мира
+    const zoneRotation = zone.rotation.y;
+
+    // Расстояние камеры от зоны (адаптируется в зависимости от типа зоны)
+    let distance = 4;
+    const zoneName = zone.name;
+    
+    // Корректируем расстояние для разных зон
+    if (zoneName === 'MainStand') {
+      distance = 5;
+    } else if (zoneName === 'AppUIZone' || zoneName === 'DashboardZone') {
+      distance = 3.5;
+    }
+
+    // Вычисляем вектор направления "вперед" для зоны с учетом её rotation
+    const forward = new THREE.Vector3(
+      Math.sin(zoneRotation),
+      0,
+      Math.cos(zoneRotation)
+    );
+
+    // Позиция камеры находится перед зоной (в направлении её "лица")
+    const targetCameraPosition = new THREE.Vector3(
+      zoneWorldPosition.x + forward.x * distance,
+      zoneWorldPosition.y + 2, // высота глаз
+      zoneWorldPosition.z + forward.z * distance
+    );
+
+    // Целевая точка взгляда - центр зоны на уровне глаз
+    const targetLookAt = new THREE.Vector3(
+      zoneWorldPosition.x,
+      zoneWorldPosition.y + 2,
+      zoneWorldPosition.z
+    );
+
+    // Сохраняем начальные позиции
+    const startCameraPosition = this.camera.position.clone();
+    const startControlsTarget = this.controls.target.clone();
+
+    // Запускаем анимацию
+    this.isTeleporting = true;
+    this.teleportStart = performance.now();
+
+    const animate = (currentTime) => {
+      if (!this.isTeleporting) return;
+
+      const elapsed = currentTime - this.teleportStart;
+      const progress = Math.min(elapsed / this.teleportDuration, 1);
+
+      // Используем easing функцию для плавности (ease-in-out cubic)
+      const eased = progress < 0.5
+        ? 4 * progress * progress * progress
+        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+      // Интерполяция позиции камеры
+      this.camera.position.lerpVectors(startCameraPosition, targetCameraPosition, eased);
+
+      // Интерполяция цели взгляда
+      this.controls.target.lerpVectors(startControlsTarget, targetLookAt, eased);
+      this.controls.update();
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        this.isTeleporting = false;
+      }
+    };
+
+    requestAnimationFrame(animate);
   }
 
   update() {
